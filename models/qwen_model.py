@@ -1,18 +1,16 @@
-import torch
-from transformers import pipeline
-from config.settings import settings
+import re
 
 class QwenModel:
     def __init__(self):
-        print("Loading Qwen model... this may take a while")
+        print("Loading Qwen model...")
         self.pipe = pipeline(
             "text-generation",
             model=settings.model_name,
             device=settings.device
         )
-        print("Model loaded successfully!")
+        print("Model loaded!")
 
-    def generate(self, prompt: str, max_new_tokens: int, temperature: float) -> str:
+    def generate(self, prompt: str, max_new_tokens: int, temperature: float) -> dict:
         messages = [{"role": "user", "content": prompt}]
         output = self.pipe(
             messages,
@@ -20,7 +18,14 @@ class QwenModel:
             do_sample=True,
             temperature=temperature
         )
-        return output[0]["generated_text"][-1]["content"]
 
-# Initialize model once
-qwen_model = QwenModel()
+        text = output[0]["generated_text"][-1]["content"]
+
+        # Extract <think> content
+        thinks_match = re.search(r"<think>(.*?)</think>", text, flags=re.DOTALL)
+        thinks = thinks_match.group(1).strip() if thinks_match else ""
+
+        # Remove <think> section to get final answer
+        ans = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
+
+        return {"thinks": thinks, "ans": ans}

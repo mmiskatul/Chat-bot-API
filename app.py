@@ -14,9 +14,10 @@ def health_check():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat_endpoint(request: ChatRequest):
-    response_text = qwen_model.generate(
+    response = qwen_model.generate(
         prompt=request.prompt,
         max_new_tokens=request.max_new_tokens,
         temperature=request.temperature
     )
-    return ChatResponse(response=response_text)
+    return ChatResponse(**response)
+
