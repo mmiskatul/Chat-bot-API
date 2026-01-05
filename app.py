@@ -1,8 +1,15 @@
+import utils.http_session
+import utils.transport
+import utils.session
 from fastapi import FastAPI
 from models.qwen_model import qwen_model
 from schemas.chat_schema import ChatRequest, ChatResponse
 
 app = FastAPI(title="Qwen Chat API")
+
+@app.get("/")
+def success():
+    return {"status":"api is running"}
 
 @app.post("/chat", response_model=ChatResponse)
 def chat_endpoint(request: ChatRequest):
