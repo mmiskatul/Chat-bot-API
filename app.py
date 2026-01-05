@@ -4,6 +4,10 @@ from schemas.chat_schema import ChatRequest, ChatResponse
 
 app = FastAPI(title="Qwen Chat API")
 
+@app.get("/")
+def success():
+    return {"status":"api is running"}
+
 @app.post("/chat", response_model=ChatResponse)
 def chat_endpoint(request: ChatRequest):
     response = qwen_model.generate(
